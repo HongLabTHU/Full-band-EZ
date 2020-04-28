@@ -7,7 +7,7 @@ from scipy.signal import spectrogram
 from scipy.ndimage import gaussian_filter
 
 
-def choose_kmeans_k(data,k_range):
+def choose_kmeans_k(data, k_range):
     k_sse=[]
     for k in k_range:
         tmp_kmeans=KMeans(n_clusters=k)
@@ -20,7 +20,7 @@ def choose_kmeans_k(data,k_range):
     return k_range[best_index]
 
 
-def find_EI_cluster_ratio(pei, labels, ei_elec_num=10):   
+def find_ei_cluster_ratio(pei, labels, ei_elec_num=10):
     top_elec_ind = list(np.argsort(-pei)[:ei_elec_num])
     top_elec_labels = list(labels[top_elec_ind])
     top_elec_count = {}
@@ -36,7 +36,8 @@ def find_EI_cluster_ratio(pei, labels, ei_elec_num=10):
             return np.array(cluster_ind2)
         else:
             return None
-        
+
+
 def pad_zero(data, length):
     data_len = len(data)
     if data_len < length:
@@ -87,7 +88,6 @@ def norm_specs(specs):
 
 
 def compute_full_band(raw_data, sfreq, ei):
-    
     ei_elec_num = 10
     print('computing spectrogram')
     raw_specs, spec_shape, t, f = cal_specs_matrix(raw_data, sfreq, 'STFT')
@@ -104,7 +104,7 @@ def compute_full_band(raw_data, sfreq, ei):
     tmp_kmeans=KMeans(n_clusters=k_num)
     tmp_kmeans.fit(spec_pca)
     pre_labels = tmp_kmeans.labels_
-    cluster_ind_ratio = find_EI_cluster_ratio(ei, pre_labels)
+    cluster_ind_ratio = find_ei_cluster_ratio(ei, pre_labels)
     
     chosen_cluster_ind = np.where(pre_labels==cluster_ind_ratio)[0]
     return spec_pca, pre_labels, chosen_cluster_ind

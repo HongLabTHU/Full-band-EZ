@@ -1,14 +1,13 @@
 # encoding=utf-8
 import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, \
-    QPushButton, QLineEdit, QDesktopWidget, QGridLayout, QFileDialog, QProgressBar, QProgressDialog, QListWidget, QLabel
+from PyQt5.QtWidgets import QApplication,  QSizePolicy, QMessageBox, QWidget, \
+    QPushButton, QLineEdit, QDesktopWidget, QGridLayout, QFileDialog,  QListWidget, QLabel
 from PyQt5.QtCore import Qt, QThread
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
 
 import matplotlib
-
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -100,7 +99,7 @@ class Brainquake(QWidget):
         self.gridlayout.addWidget(self.lineedit_patient_name, 1, 26, 1, 1)
 
         self.upload_label = QLabel(self)
-        self.upload_label.setText('not uploaded')
+        self.upload_label.setText('')
         self.gridlayout.addWidget(self.upload_label, 1, 27, 1, 1)
 
         self.lineedit_doctor_name = QLineEdit(self)
@@ -292,7 +291,6 @@ class Brainquake(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    # slot functions
     # input data
     def dialog_inputdata(self):
         self.mat_filename, b = QFileDialog.getOpenFileName(self, 'open file', '/home')
@@ -308,7 +306,7 @@ class Brainquake(QWidget):
             self.fs = tmp_fs[0][0]
             self.band_low = 1.0
             self.band_high = 500
-            self.upload_label.setText('not uploaded')
+            self.upload_label.setText('')
             self.edf_time_max = self.modified_edf_data.shape[1]/self.fs
 
             QMessageBox.information(self, '', 'data loaded')
@@ -351,6 +349,7 @@ class Brainquake(QWidget):
         self.y0 = self.edf_dmin
         self.y1 = (self.disp_chans_num - 1) * self.dr + self.edf_dmax
 
+    # refresh display
     def disp_refresh(self):
         self.canvas.axes.cla()
         self.canvas.axes.set_ylim(self.y0, self.y1)
@@ -532,8 +531,6 @@ class Brainquake(QWidget):
         self.ei_target_start = int(self.target_pos[0]*self.fs)
         self.ei_target_end = int(self.target_pos[1]*self.fs)
 
-        # modified_data, already remain useful elecs, reorder elecs, filter data
-        # to split baseline, target, fs
         self.ei_baseline_data = self.modified_edf_data.copy()[:, self.ei_base_start:self.ei_base_end]
         self.ei_target_data = self.modified_edf_data.copy()[:, self.ei_target_start:self.ei_target_end]
         self.ei_norm_target, self.ei_norm_base = ei.compute_hfer(self.ei_target_data, self.ei_baseline_data, self.fs)
@@ -562,7 +559,7 @@ class Brainquake(QWidget):
             hfer_ax.plot(self.hfer_target_start + self.ei_channel_onset, np.arange(len(self.ei_channel_onset)) + 0.5,
                          'ko')
         hfer_ax.set_xticks(np.arange(self.hfer_target_start, self.hfer_target_start + self.norm_target.shape[1], 2000))
-        hfer_ax.set_xticklabels((np.arange(self.hfer_target_start, self.hfer_target_start + self.norm_target.shape[1],
+        hfer_ax.set_xticklabels(np.rint(np.arange(self.hfer_target_start, self.hfer_target_start + self.norm_target.shape[1],
                                            2000) / float(self.fs)).astype(np.int16))
         hfer_ax.set_xlabel('time(s)')
         hfer_ax.set_ylabel('channels')
@@ -572,11 +569,11 @@ class Brainquake(QWidget):
         plt.colorbar(surf, cax=color_bar_ax, orientation='vertical')
         plt.show()
 
-
+    # press hfer to show original signal and spectrogram
     def hfer_press_func(self, e):
         chosen_elec_index = int(e.ydata)  # int(round(e.ydata))
 
-        # compute spectrum
+        # compute spectrogram
         elec_name = self.disp_ch_names[chosen_elec_index]
         raw_data_indx = self.disp_ch_names.index(elec_name)
         tmp_origin_edf_data = np.transpose(self.edf_data['mat_data'])
@@ -733,6 +730,7 @@ class Brainquake(QWidget):
         cb = plt.colorbar(surf, cax=position)
         plt.show()
 
+    # full band computation
     def fullband_computation_func(self):
         self.fullband_button.setEnabled(False)
 
@@ -749,6 +747,7 @@ class Brainquake(QWidget):
         self.fullband_thread.fullband_done_sig.connect(self.fullband_plot_func)
         self.fullband_thread.start()
 
+    # full band plot function
     def fullband_plot_func(self, fullband_res):
         QMessageBox.information(self, '', 'fullband computation done')
         self.fullband_button.setEnabled(True)
@@ -817,29 +816,6 @@ class Brainquake(QWidget):
         ax2.set_xlim(tmp_time_target[0], tmp_time_target[-1])
         position = fig.add_axes([0.85, 0.15, 0.02, 0.3])
         cb = plt.colorbar(surf, cax=position)
-        plt.show()
-
-    # other test
-    def set_upload(self):
-        self.upload_label.setText('uploaded')
-        self.ei_button.setEnabled(True)
-        self.fi_button.setEnabled(True)
-
-    def return_current_chs_index(self):
-        current_ch_names = self.modified_edf_data.info['ch_names']
-        current_ch_indexs = np.concatenate([np.where(self.renamed_ch_names == x)[0] for x in current_ch_names])
-        return current_ch_indexs
-
-    def print_xy(self, e):
-        print(e.xdata, e.ydata)
-
-    def new_plot(self):
-        self.ei_fig = plt.figure(figsize=(5, 4), dpi=100)
-        self.ei_axes = self.ei_fig.add_subplot(111)
-        self.ei_axes.plot(range(10))
-        self.fi_fig = plt.figure(figsize=(5, 4), dpi=100)
-        self.fi_axes = self.fi_fig.add_subplot(111)
-        self.fi_axes.bar(np.arange(len(self.ei_ei)), self.ei_ei)
         plt.show()
 
 

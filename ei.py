@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import butter,filtfilt,lfilter
+from scipy.signal import lfilter
 
 
 def compute_hfer(target_data,base_data,fs):
@@ -34,7 +34,6 @@ def determine_threshold_onset(target,base):
 
 def compute_ei_index(target,base,fs):
     channel_onset=determine_threshold_onset(target,base)
-    # print channel_onset
     seizure_location=np.min(channel_onset)
     onset_channel=np.argmin(channel_onset)
     hfer=np.sum(target[:,int(seizure_location):int(seizure_location+0.25*fs)],axis=1)/(fs*0.25)
