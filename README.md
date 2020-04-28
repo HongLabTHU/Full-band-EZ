@@ -5,4 +5,4 @@ This repository requires python3.6. Install the dependencies from PyPI:
 ```python
 pip3 install -r requirements.txt
 ```
-To reproduce the major results reported in the paper, download the data from this [link](https://github.com/TongZhh/BrainQuake/edit/master/data). Then run the main.py and choose the data file in the pop-up window.
+To reproduce the major results reported in the paper, download the data from this [link](https://github.com/TongZhh/BrainQuake/edit/master/data). Then run the main.py and a gui would be shown as below.<br>![](https://github.com/TongZhh/BrainQuake/edit/master/Assets/gui.png). Choose the data file in the pop-up window after pressing 'input data' button.
