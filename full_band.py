@@ -1,18 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import matplotlib as mpl
-from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
-import os
-import pickle
-from sklearn.metrics import auc
-from mpl_toolkits.mplot3d import Axes3D
-from sklearn import metrics
 from scipy.signal import spectrogram
 from scipy.ndimage import gaussian_filter
-#import pywt
 
 
 def choose_kmeans_k(data,k_range):
@@ -67,7 +59,6 @@ def cal_specs_matrix(raw, sfreq, method='STFT'):
     freq_range = 300
     half_width = win_len * sfreq
     ch_num = raw.shape[0]
-    #    raw_data.notch_filter(np.arange(50, 301, 50))
     if method == 'STFT':
         for i in range(ch_num):
             print(str(i)+'/'+str(ch_num))
@@ -117,4 +108,3 @@ def compute_full_band(raw_data, sfreq, ei):
     
     chosen_cluster_ind = np.where(pre_labels==cluster_ind_ratio)[0]
     return spec_pca, pre_labels, chosen_cluster_ind
-    
