@@ -9,4 +9,4 @@ To reproduce the major results reported in the paper, download the data from thi
 ![](https://github.com/TongZhh/BrainQuake/raw/master/Assets/gui.png)<br>
 Choose the data file in the pop-up window after pressing 'input data' button.
 ### Support
-If you have a question or feedback, or find any problems, you can contact us by [email](zhaotongztzt@gmail.com) or open an issue on GitHub.
+If you have a question or feedback, or find any problems, you can contact us by [email](mailto:zhaotongztzt@gmail.com) or open an issue on GitHub.
