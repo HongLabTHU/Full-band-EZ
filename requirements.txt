@@ -2,5 +2,4 @@ numpy
 matplotlib==3.1.0
 scipy>=1.1.0
 h5py
-PyQt5
 sklearn

@@ -62,7 +62,8 @@ def cal_specs_matrix(raw, sfreq, method='STFT'):
     ch_num = raw.shape[0]
     if method == 'STFT':
         for i in range(ch_num):
-            print(str(i)+'/'+str(ch_num))
+            if i % 10 == 0:
+                print(str(i)+'/'+str(ch_num))
             time_signal = raw[i, :].ravel()
             time_signal = pad_zero(time_signal, 2 * half_width)
             f, t, hfo_spec = spectrogram(time_signal, fs=int(sfreq), nperseg=int(half_width),
@@ -76,7 +77,7 @@ def cal_specs_matrix(raw, sfreq, method='STFT'):
             if i == 0:
                 chan_specs = tmp_specs
             else:
-                chan_specs = np.row_stack((chan_specs,tmp_specs))
+                chan_specs = np.row_stack((chan_specs, tmp_specs))
     f_cut = f[:freq_range]
     return chan_specs, hfo_new.shape, t, f_cut
 
@@ -92,7 +93,7 @@ def compute_full_band(raw_data, sfreq, ei):
     print('computing spectrogram')
     raw_specs, spec_shape, t, f = cal_specs_matrix(raw_data, sfreq, 'STFT')
     raw_specs_norm = norm_specs(raw_specs)
-    print('dimensionality reducting')
+    print('dimensionality reducing')
     proj_pca = PCA(n_components=5)
     spec_pca = proj_pca.fit_transform(raw_specs_norm)
     top_elec_ind = np.argsort(-ei)[:ei_elec_num]
