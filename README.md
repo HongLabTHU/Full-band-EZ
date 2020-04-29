@@ -5,8 +5,10 @@ This repository requires python3.6. Install the dependencies from PyPI:
 ```python
 pip3 install -r requirements.txt
 ```
-To reproduce the major results reported in the paper, download the data from this [link](https://github.com/TongZhh/BrainQuake/raw/master/data). Then run the main.py and a gui would be shown as below.<br>
-![](https://github.com/TongZhh/BrainQuake/raw/master/Assets/gui.png)<br>
-Choose the data file in the pop-up window after pressing 'input data' button.
+To reproduce the major results reported in the paper, download the data from this [link](https://github.com/TongZhh/BrainQuake/raw/master/data). put it under the data directory. Then simply run the notebook main_fig.ipynb.<br>
+If you want to see the original signal and time-frequency map of any channels by pressing on these three figures, you can also download and run another version with interaction:
+```python
+python3 main.py
+```
 ### Support
 If you have a question or feedback, or find any problems, you can contact us by [email](mailto:zhaotongztzt@gmail.com) or open an issue on GitHub.
