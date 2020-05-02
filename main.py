@@ -152,7 +152,7 @@ def hfer_plot_func(data):
     hfer_fig = plt.figure('hfer')
     hfer_ax = hfer_fig.add_axes([0.1, 0.1, 0.7, 0.8])
     tmp_x, tmp_y = np.meshgrid(np.arange(norm_target.shape[1] + 1), np.arange(norm_target.shape[0] + 1))
-    surf = hfer_ax.pcolormesh(tmp_x, tmp_y, norm_target, cmap=plt.cm.hot, vmax=50, vmin=0)
+    surf = hfer_ax.pcolormesh(tmp_x, tmp_y, norm_target, cmap=plt.cm.jet, vmax=50, vmin=0)
     hfer_ax.set_xticks(np.arange(0, norm_target.shape[1], 2000))
     hfer_ax.set_xticklabels(np.rint(np.arange(0, norm_target.shape[1],2000) / float(fs)).astype(np.int16), fontsize=6)
     hfer_ax.set_xlabel('time(s)')
@@ -207,6 +207,29 @@ def ei_plot_func(data):
     show_signal_handle = show_signal(ei_ei_fig.canvas, ei_ei_ax, modified_mat_data, fs, chans_list, 1)
     plt.show()
 
+    # plot ei top 10 channels
+    ei_top10_fig = plt.figure('ei top 10')
+    ei_top10_ax = ei_top10_fig.add_subplot(111)
+    x = np.linspace(0, len(ei_ei) - 1, len(ei_ei))
+    ei_top10_ax.bar(x, ei_ei, color=[0.8, 0.8, 0.8])
+    sorted_ei = np.sort(ei_ei)
+    sorted_ei_arg = np.argsort(ei_ei)
+    ei_top10_ax.bar(sorted_ei_arg[-10:], sorted_ei[-10:], color='orange')
+    elecs_info, chs_info = refresh_electrodes_info(chans_list)
+    elec_labels = [x[0] for x in elecs_info]
+    elec_nums = [int(x[1]) for x in elecs_info]
+    color_cums = np.cumsum(elec_nums)
+    tmp_color_cums = np.concatenate([np.array([0]), color_cums])
+    x_ticks = [(tmp_color_cums[i - 1] + tmp_color_cums[i]) / 2.0 for i in range(1, len(tmp_color_cums))]
+    ei_top10_ax.set_xticks(x_ticks)
+    ei_top10_ax.set_xticklabels(elec_labels)
+    ei_top10_ax.spines['top'].set_visible(False)
+    ei_top10_ax.spines['right'].set_visible(False)
+
+    # press function
+    show_signal_handle = show_signal(ei_top10_fig.canvas, ei_ei_ax, modified_mat_data, fs, chans_list, 1)
+    plt.show()
+
 
 # full band plot function
 def full_band_plot_func(data):
@@ -227,10 +250,30 @@ def full_band_plot_func(data):
     fullband_ax = fullband_fig.add_subplot(111)
     fullband_ax.scatter(spec_pca[:, 0], spec_pca[:, 1], alpha=0.8, c=fullband_labels)
     for ind in fullband_ind:
-        fullband_ax.text(spec_pca[ind, 0], spec_pca[ind, 1], chans_list[ind],fontsize=8, color='k')
+        fullband_ax.text(spec_pca[ind, 0], spec_pca[ind, 1], chans_list[ind], fontsize=8, color='k')
 
     # press function
     show_signal_handle = show_signal(fullband_fig.canvas, fullband_ax, modified_mat_data, fs, chans_list, 3, spec_pca)
+    plt.show()
+
+    # highlight epileptogenic cluster and HFEI top 10 channels
+    # orange represents HFEI top 10 channels, yellow and the text represent epileptogenic cluster
+    fullband_hl_fig = plt.figure('full_band_highlight')
+    fullband_hl_ax = fullband_hl_fig.add_subplot(111)
+    ei_top_ind = np.argsort(-ei_ei)[:10]
+    for i in range(len(fullband_labels)):
+        if i in ei_top_ind:
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='orange')
+        elif i in fullband_ind:
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='yellow')
+        else:
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='gray')
+    for ind in fullband_ind:
+        fullband_hl_ax.text(spec_pca[ind, 0], spec_pca[ind, 1], chans_list[ind], fontsize=8, color='k')
+
+    # press function
+    show_signal_handle = show_signal(fullband_hl_fig.canvas, fullband_ax, modified_mat_data, fs, chans_list, 3,
+                                     spec_pca)
     plt.show()
 
 
