@@ -23,6 +23,7 @@ In addition to high-frequency activity, there are other potential biomarkers of 
 The time-frequency pattern was extracted by calculating the time-frequency map for each channel first. Then the time-frequency map, containing 427500 pixels, was then expanded into a vector.<br>
 The exorbitant dimension would bring a huge amount of computation to the computer, and also redundant information or noise information, which may result in overfitting. Therefore, it is necessary to reduce the dimension. Here we used principal component analysis(PCA) as the method for dimension reduction. <br>
 After the the dimension reduction, channels would be transformed into the PC space, in which two points closer together tend to have similar time-frequency pattern. We used a distance-based clustering method, K-means, to categorize the channels. <br>
+![](Assets/full_band_3d.png)<br>
 After clustering, channels were divided into different clusters. The 'committee' made up by the 10 channels with the highest HFEI voted for the epileptogenic cluster. In the figure below, the orange dots represents the channels in the 'committee', the yellow/orange dots with text annotation represents the channels within the epileptogenic cluster.<br>
 ![](Assets/full_band_highlight_3d.png)<br>
 ### Support
