@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 
 import numpy as np
 import scipy
@@ -22,8 +23,8 @@ class show_signal(object):
         self.raw_data = raw_data.copy()
         self.sfreq = sfreq
         self.ch_names = ch_names
-        self.spec_win_len = 0.2
-        self.spec_overlap = 0.9
+        self.spec_win_len = 0.5
+        self.spec_overlap = 0.8
         self.press_type = press_type
         self.pca_data = pca_data
         self.draw_ind = 0
@@ -41,7 +42,7 @@ class show_signal(object):
             time_signal = tmp_data
         f, t, hfo_spec = spectrogram(time_signal, fs=int(sfreq), nperseg=int(half_width),
                                      noverlap=int(self.spec_overlap * half_width),
-                                     nfft=sfreq, mode='magnitude')
+                                     nfft=1024, mode='magnitude')
         hfo_new = 20 * np.log10(hfo_spec + 1e-10)
         # cal zscore
         dmean = np.mean(hfo_new, axis=1)
@@ -55,6 +56,7 @@ class show_signal(object):
         ax_raw = fig.add_axes([0.2, 0.55, 0.65, 0.35])
         ax_raw.cla()
         ax_raw.plot(time_signal)
+        ax_raw.axvline(15*sfreq, color='black')
         ax_raw.set_title(chan_name + ' signal')
         ax_raw.set_xlim([0, time_signal.shape[0]])
         ax_raw.set_xticks([])
@@ -64,7 +66,8 @@ class show_signal(object):
         ax_spec = fig.add_axes([0.2, 0.15, 0.65, 0.35])
         ax_spec.cla()
         ax_spec.set_title(chan_name + ' spectrogram')
-        surf = ax_spec.pcolormesh(t, f, hfo_new3, cmap='hot', vmax=2, vmin=-1)
+        surf = ax_spec.pcolormesh(t-15, f, hfo_new3, cmap='hot', vmax=2, vmin=-1)
+        ax_spec.axvline(0, color='white')
         ax_spec.set_ylim((0, 300))
         ax_spec.set_xlabel('time(s)')
         ax_spec.set_ylabel('frequency(HZ)')
@@ -130,7 +133,10 @@ def refresh_electrodes_info(chans_list):
     single_chns.sort(key=lambda x: x[0])
     double_chns.sort(key=lambda x: x[0])
     if double_chns != []:
-        elecs_info = np.concatenate([np.array(single_chns), np.array(double_chns)], axis=0)
+        if tmp_chs_names[0][1].isdigit():
+            elecs_info = np.concatenate([np.array(single_chns), np.array(double_chns)], axis=0)
+        else:
+            elecs_info = np.concatenate([np.array(double_chns), np.array(single_chns)], axis=0)
     else:
         elecs_info = np.array(single_chns)
     return elecs_info, chs_info
@@ -259,17 +265,17 @@ def full_band_plot_func(data):
     # highlight epileptogenic cluster and HFEI top 10 channels
     # orange represents HFEI top 10 channels, yellow and the text represent epileptogenic cluster
     fullband_hl_fig = plt.figure('full_band_highlight')
-    fullband_hl_ax = fullband_hl_fig.add_subplot(111)
+    fullband_hl_ax = Axes3D(fullband_hl_fig)
     ei_top_ind = np.argsort(-ei_ei)[:10]
     for i in range(len(fullband_labels)):
         if i in ei_top_ind:
-            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='orange')
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], spec_pca[i, 2], alpha=0.8, c='orange')
         elif i in fullband_ind:
-            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='yellow')
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], spec_pca[i, 2], alpha=0.8, c='yellow')
         else:
-            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], alpha=0.8, c='gray')
+            fullband_hl_ax.scatter(spec_pca[i, 0], spec_pca[i, 1], spec_pca[i, 2], alpha=0.8, c='gray')
     for ind in fullband_ind:
-        fullband_hl_ax.text(spec_pca[ind, 0], spec_pca[ind, 1], chans_list[ind], fontsize=8, color='k')
+        fullband_hl_ax.text(spec_pca[ind, 0], spec_pca[ind, 1], spec_pca[ind, 2], chans_list[ind], fontsize=8, color='k')
 
     # press function
     show_signal_handle = show_signal(fullband_hl_fig.canvas, fullband_ax, modified_mat_data, fs, chans_list, 3,

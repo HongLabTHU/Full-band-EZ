@@ -55,8 +55,8 @@ def cal_zscore(data):
         
 
 def cal_specs_matrix(raw, sfreq, method='STFT'):
-    win_len = 0.2
-    overlap = 0.9
+    win_len = 0.5
+    overlap = 0.8
     freq_range = 300
     half_width = win_len * sfreq
     ch_num = raw.shape[0]
@@ -68,7 +68,7 @@ def cal_specs_matrix(raw, sfreq, method='STFT'):
             time_signal = pad_zero(time_signal, 2 * half_width)
             f, t, hfo_spec = spectrogram(time_signal, fs=int(sfreq), nperseg=int(half_width),
                                          noverlap=int(overlap * half_width),
-                                         nfft=2000, mode='magnitude')
+                                         nfft=1024, mode='magnitude')
             hfo_new = 20 * np.log10(hfo_spec + 1e-10)
             hfo_new = cal_zscore(hfo_new)
             hfo_new = gaussian_filter(hfo_new, sigma=2)
