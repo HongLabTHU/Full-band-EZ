@@ -290,10 +290,10 @@ if __name__ == '__main__':
     data = input_data(mat_filename)
 
     # plot hfer result
-    hfer_plot_func(data)
+    # hfer_plot_func(data)
 
     # plot ei result
-    ei_plot_func(data)
+    # ei_plot_func(data)
 
     # plot full band result
     full_band_plot_func(data)

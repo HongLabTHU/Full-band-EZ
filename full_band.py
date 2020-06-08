@@ -72,7 +72,8 @@ def cal_specs_matrix(raw, sfreq, method='STFT'):
             hfo_new = 20 * np.log10(hfo_spec + 1e-10)
             hfo_new = cal_zscore(hfo_new)
             hfo_new = gaussian_filter(hfo_new, sigma=2)
-            hfo_new = hfo_new[:freq_range,:]
+            freq_nums = int(len(f)*freq_range/f.max())
+            hfo_new = hfo_new[:freq_nums, :]
             tmp_specs = np.reshape(hfo_new, (-1,))
             if i == 0:
                 chan_specs = tmp_specs
